@@ -363,7 +363,40 @@ function updateVisualization() {
     renderVisualization(timePoints, technologiesData);
 }
 
+// Setup toggle all functionality
+function setupToggleAll() {
+    const toggleButton = document.getElementById('toggle-all');
+    let allSelected = true;
+
+    toggleButton.addEventListener('click', () => {
+        allSelected = !allSelected;
+        const checkboxes = document.querySelectorAll('#filter-list input[type="checkbox"]');
+
+        checkboxes.forEach(checkbox => {
+            const tech = checkbox.id.replace('filter-', '');
+            checkbox.checked = allSelected;
+
+            if (allSelected) {
+                activeFilters.add(tech);
+                forcedTechnologies.add(tech);
+                forcedTechnologies.delete(`blocked:${tech}`);
+            } else {
+                activeFilters.delete(tech);
+                forcedTechnologies.delete(tech);
+                // Don't add to blocked if it doesn't meet threshold
+                const data = technologiesData.find(d => d.technology === tech);
+                if (data && data.rankChange >= minRankChange) {
+                    forcedTechnologies.add(`blocked:${tech}`);
+                }
+            }
+        });
+
+        updateVisualization();
+    });
+}
+
 // Initialize visualization
 loadData();
 setupRankChangeFilter();
 setupResizeHandle();
+setupToggleAll();

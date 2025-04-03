@@ -1,0 +1,137 @@
+Technology,2024-09-07,2024-11-07,2025-02-06,2025-04-03
+Azure,1,1,3,3
+SQL,2,2,4,4
+AWS,3,3,5,5
+Python,4,4,6,6
+JavaScript,5,5,13,18
+Microsoft 365,9,8,19,25
+C#,6,6,21,26
+Java,8,9,28,29
+Power Platform,14,13,35,30
+Active Directory,10,10,33,33
+.NET,7,7,27,34
+React,11,12,31,35
+Kubernetes,16,15,37,36
+Docker,20,16,34,39
+HTML,12,11,36,41
+TypeScript,18,18,45,42
+SQL Server,17,17,43,45
+SaaS,21,21,54,47
+Power BI,23,22,56,50
+Git,19,20,48,55
+GCP,13,14,40,56
+MATLAB,106,67,92,57
+JIRA,29,29,63,60
+Terraform,22,23,61,61
+CSS,15,19,47,65
+PowerShell,26,25,76,71
+SharePoint,27,27,73,75
+Serverless,52,35,82,76
+AngularJS,25,26,78,83
+C++,24,24,75,84
+Node.js,32,30,85,85
+Azure DevOps,28,28,84,86
+REST,37,34,99,94
+GitHub,54,33,86,99
+PostgreSQL,36,37,103,105
+VMware Infrastructure,34,31,98,107
+Microsoft Exchange,38,41,111,108
+Jenkins,58,44,109,110
+Dynamics 365,31,40,136,121
+MySQL,39,36,100,122
+Entra ID,33,42,118,123
+Data Warehouse,35,38,121,124
+Rational DOORS,154,128,145,125
+Ansible,43,39,110,128
+RESTful,48,45,134,132
+PHP,42,43,126,134
+C,30,32,107,136
+Microsoft Intune,50,54,151,137
+AWS Lambda,110,68,155,140
+Data Lake,46,47,182,147
+Tableau,57,59,174,148
+NoSQL,40,57,168,151
+Kafka,64,81,196,159
+Amazon S3,81,63,176,163
+PaaS,82,60,178,166
+PowerApps,70,61,185,169
+Confluence,89,83,184,170
+.NET Framework,53,49,163,172
+Relational Database,47,50,138,173
+Power Automate,79,75,202,174
+Bash,45,46,154,176
+.NET Core,51,52,180,177
+ASP.NET,41,48,173,192
+Teamcenter,220,157,262,198
+Hyper-V,59,51,162,201
+IaaS,105,72,201,211
+Big Data,73,93,285,213
+CMS,108,88,234,216
+MongoDB,60,73,190,217
+XML,71,64,188,222
+Spring,56,74,212,223
+Go,87,87,239,226
+Web Services,44,55,194,227
+JSON,66,80,230,229
+dbt,63,62,260,231
+Apache,49,58,247,235
+Apache Airflow,61,71,266,238
+Dynamics CRM,86,91,282,241
+Cloud Computing,83,66,197,245
+Snowflake,62,65,267,246
+Spring Boot,76,92,238,247
+DynamoDB,149,97,251,248
+Azure Data Factory,111,98,289,251
+Vue,55,69,228,252
+SCCM,95,85,256,256
+HTML5,72,56,179,257
+R,117,105,257,261
+Azure Logic Apps,130,116,292,262
+Redis,173,96,271,266
+Visual Studio,103,99,264,268
+PySpark,114,132,362,270
+T-SQL,84,77,231,271
+Amazon EC2,131,125,307,275
+Amazon SQS,196,117,270,279
+Amazon ECS,155,148,336,280
+GitLab,77,70,232,281
+GraphQL,91,94,273,282
+SOAP,123,123,306,283
+Apache Spark,109,144,327,284
+Laravel,99,107,286,289
+Pandas,68,76,321,290
+Amazon Athena,78,86,355,292
+jQuery,67,108,291,296
+SQL Server Reporting Services,122,118,303,297
+OneDrive,113,131,323,299
+Google Analytics,189,187,#N/A,303
+Rust,158,137,324,305
+Middleware,134,134,308,306
+Dremio,80,90,#N/A,316
+Tailwind CSS,218,120,294,317
+Azure Functions,139,139,331,318
+Selenium,115,121,318,321
+Azure Synapse Analytics,135,127,341,322
+NumPy,75,78,342,324
+AWS CloudFormation,168,142,360,328
+SQL Server Integration Services,112,109,316,331
+Amazon RDS,98,101,330,336
+SAP S/4HANA,140,126,304,338
+Firmware,90,84,278,339
+Azure SQL Database,129,115,298,340
+Entity Framework,97,104,297,341
+PL/SQL,136,136,352,347
+React Native,178,155,381,349
+Virtual Machines,118,122,353,350
+Grafana,102,89,263,352
+Django,125,103,311,358
+Redux,153,149,343,361
+Amazon Kinesis,227,130,350,363
+NetSuite,239,214,#N/A,364
+Apache Arrow,92,106,#N/A,365
+Next.js,176,168,371,374
+GitHub Actions,167,153,#N/A,377
+Power Query,210,222,#N/A,385
+Virtual Desktop,183,162,#N/A,386
+Figma,148,151,379,388
+Prometheus,100,113,344,392

@@ -15,18 +15,47 @@
 
         .container {
             display: flex;
-            gap: 20px;
+            position: relative;
+            gap: 0;
+            min-height: 600px;
         }
 
         #filters {
-            width: 200px;
+            width: 500px;
+            min-width: 300px;
             padding: 20px;
             background: white;
-            border-radius: 5px;
+            border-radius: 5px 0 0 5px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+        }
+
+        #resize-handle {
+            width: 8px;
+            background-color: #e9ecef;
+            cursor: col-resize;
+            transition: background-color 0.2s;
+            position: relative;
+            z-index: 2;
+        }
+
+        #resize-handle:hover {
+            background-color: #dee2e6;
+        }
+
+        #resize-handle::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 3px;
+            width: 2px;
+            height: 100%;
+            background-color: #ced4da;
         }
 
         #visualization {
+            border-radius: 0 5px 5px 0;
             flex-grow: 1;
             background: white;
             border-radius: 5px;
@@ -34,8 +63,20 @@
             padding: 20px;
         }
 
+        #filter-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
         .filter-item {
-            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .filter-item label {
@@ -71,8 +112,15 @@
     <div class="container">
         <div id="filters">
             <h3>Technologies</h3>
+            <div class="position-change-filter">
+                <label for="position-change">Min Rank Change:</label>
+                <input type="number" id="position-change" min="0" value="0" style="width: 60px; margin: 10px 0;"
+                    title="Show only technologies whose rank has changed by at least this amount">
+                <button id="apply-filter" style="margin-left: 10px;">Apply</button>
+            </div>
             <div id="filter-list"></div>
         </div>
+        <div id="resize-handle"></div>
         <div id="visualization"></div>
     </div>
     <script src="visualization.js"></script>

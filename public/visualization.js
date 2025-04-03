@@ -1,3 +1,50 @@
+// Resize functionality
+function setupResizeHandle() {
+    const resizeHandle = document.getElementById('resize-handle');
+    const filtersPanel = document.getElementById('filters');
+    let isResizing = false;
+    let startX;
+    let startWidth;
+
+    resizeHandle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        startX = e.pageX;
+        startWidth = parseInt(window.getComputedStyle(filtersPanel).width, 10);
+        document.body.style.cursor = 'col-resize';
+
+        // Add overlay to prevent SVG interference with mouse events
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.right = '0';
+        overlay.style.bottom = '0';
+        overlay.style.zIndex = '9999';
+        document.body.appendChild(overlay);
+
+        function onMouseMove(e) {
+            if (!isResizing) return;
+            const width = startWidth + (e.pageX - startX);
+            if (width >= 300) { // Minimum width
+                filtersPanel.style.width = `${width}px`;
+            }
+        }
+
+        function onMouseUp() {
+            isResizing = false;
+            document.body.style.cursor = '';
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            document.body.removeChild(overlay);
+            // Trigger visualization update to adjust to new width
+            renderVisualization(timePoints, technologiesData);
+        }
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    });
+}
+
 // Configuration
 const config = {
     width: 1200,
@@ -10,6 +57,92 @@ const config = {
 
 // State management for filters
 let activeFilters = new Set();
+let minRankChange = 0;
+let forcedTechnologies = new Set();
+let technologiesData = null;
+
+// Rank change filter handler
+function setupRankChangeFilter() {
+    const applyButton = document.getElementById('apply-filter');
+    applyButton.addEventListener('click', () => {
+        const input = document.getElementById('position-change');
+        minRankChange = parseInt(input.value) || 0;
+        forcedTechnologies.clear(); // Reset forced technologies
+        updateCheckboxes();
+        updateVisualization();
+    });
+}
+
+// Update checkbox states based on rank changes
+function updateCheckboxes() {
+    if (!technologiesData) return;
+
+    const techRankChanges = new Map();
+    Array.from(d3.group(technologiesData, d => d.technology).entries()).forEach(([tech, data]) => {
+        techRankChanges.set(tech, data[0].rankChange);
+    });
+
+    // Sort technologies by visibility and name
+    const sortedTechs = Array.from(techRankChanges.entries())
+        .sort(([techA, changeA], [techB, changeB]) => {
+            const visibleA = changeA >= minRankChange || forcedTechnologies.has(techA);
+            const visibleB = changeB >= minRankChange || forcedTechnologies.has(techB);
+            if (visibleA !== visibleB) return visibleB - visibleA;
+            return techA.localeCompare(techB);
+        });
+
+    // Clear and rebuild filter list
+    const filterList = d3.select('#filter-list');
+    filterList.selectAll('*').remove();
+
+    // Get color mapping for technologies
+    const techColors = new Map();
+    Array.from(techRankChanges.keys()).forEach((tech, i) => {
+        techColors.set(tech, config.lineColors[i % config.lineColors.length]);
+    });
+
+    sortedTechs.forEach(([tech, rankChange]) => {
+        const meetsRankThreshold = rankChange >= minRankChange;
+        const isForced = forcedTechnologies.has(tech);
+        const isVisible = meetsRankThreshold || isForced;
+        const color = techColors.get(tech);
+
+        const filterItem = filterList
+            .append('div')
+            .attr('class', 'filter-item');
+
+        const checkbox = filterItem
+            .append('input')
+            .attr('type', 'checkbox')
+            .attr('id', `filter-${tech}`)
+            .property('checked', isVisible)
+            .on('change', function () {
+                if (this.checked) {
+                    activeFilters.add(tech);
+                    if (!meetsRankThreshold) {
+                        forcedTechnologies.add(tech);
+                    }
+                } else {
+                    activeFilters.delete(tech);
+                    forcedTechnologies.delete(tech);
+                }
+                updateVisualization();
+            });
+
+        filterItem
+            .append('label')
+            .attr('for', `filter-${tech}`)
+            .text(tech)
+            .style('color', color);
+
+        // Update active filters
+        if (isVisible) {
+            activeFilters.add(tech);
+        } else {
+            activeFilters.delete(tech);
+        }
+    });
+}
 
 // Create SVG
 const svg = d3.select('#visualization')
@@ -28,45 +161,15 @@ async function loadData() {
     const response = await fetch('/api/data');
     const { timePoints, technologies, processedData } = await response.json();
 
-    // Initialize all technologies as active
-    activeFilters = new Set(technologies);
+    // Store data for checkbox updates
+    technologiesData = processedData;
 
-    // Setup filters
-    setupFilters(technologies);
+    // Initialize active filters based on rank changes
+    activeFilters = new Set();
+    updateCheckboxes();
 
     // Initial render
     renderVisualization(timePoints, processedData);
-}
-
-// Setup filter checkboxes
-function setupFilters(technologies) {
-    const filterList = d3.select('#filter-list');
-
-    technologies.forEach((tech, i) => {
-        const filterItem = filterList
-            .append('div')
-            .attr('class', 'filter-item');
-
-        filterItem
-            .append('input')
-            .attr('type', 'checkbox')
-            .attr('id', `filter-${tech}`)
-            .attr('checked', true)
-            .on('change', function () {
-                if (this.checked) {
-                    activeFilters.add(tech);
-                } else {
-                    activeFilters.delete(tech);
-                }
-                updateVisualization();
-            });
-
-        filterItem
-            .append('label')
-            .attr('for', `filter-${tech}`)
-            .text(tech)
-            .style('color', config.lineColors[i % config.lineColors.length]);
-    });
 }
 
 // Render the visualization
@@ -89,8 +192,15 @@ function renderVisualization(timePoints, data) {
     // Group data by technology
     const techLines = d3.group(data, d => d.technology);
 
+    // Get color mapping for technologies
+    const techColors = new Map();
+    Array.from(techLines.keys()).forEach((tech, i) => {
+        techColors.set(tech, config.lineColors[i % config.lineColors.length]);
+    });
+
     // Draw lines for each technology
-    Array.from(techLines.entries()).forEach(([tech, techData], i) => {
+    Array.from(techLines.entries()).forEach(([tech, techData]) => {
+        // Check if technology should be visible (either meets rank change threshold or is forced)
         if (activeFilters.has(tech)) {
             // Sort by time point
             techData.sort((a, b) => timePoints.indexOf(a.timePoint) - timePoints.indexOf(b.timePoint));
@@ -101,7 +211,7 @@ function renderVisualization(timePoints, data) {
                 .y(d => yScale(d.rank));
 
             // Draw the line
-            const color = config.lineColors[i % config.lineColors.length];
+            const color = techColors.get(tech);
 
             svg.append('path')
                 .datum(techData)
@@ -127,7 +237,8 @@ function renderVisualization(timePoints, data) {
                         Technology: ${d.technology}<br/>
                         Time: ${d.timePoint}<br/>
                         Rank: ${d.rank}<br/>
-                        Original Position: ${d.originalPosition}
+                        Original Position: ${d.originalPosition}<br/>
+                        Rank Change: ${d.rankChange}
                     `)
                         .style('left', (event.pageX + 10) + 'px')
                         .style('top', (event.pageY - 28) + 'px');
@@ -188,9 +299,13 @@ function updateVisualization() {
     fetch('/api/data')
         .then(response => response.json())
         .then(({ timePoints, technologies, processedData }) => {
+            technologiesData = processedData;
+            updateCheckboxes();
             renderVisualization(timePoints, processedData);
         });
 }
 
 // Initialize visualization
 loadData();
+setupRankChangeFilter();
+setupResizeHandle();

@@ -8,6 +8,33 @@ const port = 3000;
 // Serve static files from public directory
 app.use(express.static('public'));
 
+// Calculate rank changes for each technology
+function calculateRankChanges(processedData) {
+    const changes = {};
+    const techRanks = {};
+
+    // Group ranks by technology
+    processedData.forEach(item => {
+        if (!techRanks[item.technology]) {
+            techRanks[item.technology] = [];
+        }
+        techRanks[item.technology].push(item.rank);
+    });
+
+    // Calculate max rank change for each technology
+    Object.entries(techRanks).forEach(([tech, ranks]) => {
+        if (ranks.length >= 2) {
+            const minRank = Math.min(...ranks);
+            const maxRank = Math.max(...ranks);
+            changes[tech] = maxRank - minRank;
+        } else {
+            changes[tech] = 0;
+        }
+    });
+
+    return changes;
+}
+
 // Process data for visualization
 function processData({ timePoints, data }) {
     const processedData = [];
@@ -34,7 +61,8 @@ function processData({ timePoints, data }) {
                 timePoint,
                 position: continuousPosition,
                 rank: continuousPosition,
-                originalPosition: item.position
+                originalPosition: item.position,
+                rankChange: 0 // Will be updated after all data is processed
             });
             continuousPosition++;
         });
@@ -47,9 +75,16 @@ function processData({ timePoints, data }) {
                 timePoint,
                 position: lastRank + index + 1,
                 rank: lastRank + index + 1,
-                originalPosition: null
+                originalPosition: null,
+                rankChange: 0 // Will be updated after all data is processed
             });
         });
+    });
+
+    // Calculate and add rank changes
+    const rankChanges = calculateRankChanges(processedData);
+    processedData.forEach(item => {
+        item.rankChange = rankChanges[item.technology];
     });
 
     return processedData;
